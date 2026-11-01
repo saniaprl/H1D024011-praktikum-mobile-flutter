@@ -1,29 +1,27 @@
-class Queue {
-  List<int> data = [];
-
-  void enqueue(int nilai) {
-    data.add(nilai);
-  }
-
-  int? dequeue() {
-    if (data.isEmpty) {
-      print("Queue kosong");
-      return null;
-    }
-
-    return data.removeAt(0);
-  }
-}
+import 'package:flutter/material.dart';
+import 'package:belajarflutter/hello_world.dart';
+import 'package:belajarflutter/column_widget.dart';
+import 'package:belajarflutter/row_widget.dart';
+import 'package:belajarflutter/ui/produk_form.dart';
+import 'package:belajarflutter/ui/produk_page.dart';
 
 void main() {
-  Queue antrean = Queue();
+  runApp(const MyApp());
+}
 
-  antrean.enqueue(10);
-  antrean.enqueue(20);
-  antrean.enqueue(30);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-  print("Isi Queue: ${antrean.data}");
-
-  print("Data keluar: ${antrean.dequeue()}");
-  print("Isi Queue sekarang: ${antrean.data}");
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      title: "Aplikasi Flutter Pertama",
+      home: HelloWorld(),
+      // Ganti sesuai langkah yang dikerjakan:
+      //home: ColumnWidget(),
+      // home: RowWidget(),
+      // home: ProdukForm(),
+      // home: ProdukPage(),
+    );
+  }
 }
