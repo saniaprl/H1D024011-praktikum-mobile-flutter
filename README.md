@@ -33,3 +33,14 @@ https://github.com/saniaprl/H1D024011-praktikum-mobile-flutter-toko-kita-api
 <img width="200" alt="Screenshot_2026-11-18-00-35-25-563_com example queue_dart" src="https://github.com/user-attachments/assets/3771c1b1-9480-4f86-a283-3d61e0ec3c0a" />
 <img width="200" alt="Screenshot_2026-11-18-00-35-29-477_com example queue_dart" src="https://github.com/user-attachments/assets/487cc393-fd53-43db-8a72-2803403873bf" />
 <img width="200" alt="Screenshot_2026-11-18-00-35-35-734_com example queue_dart" src="https://github.com/user-attachments/assets/aa79d880-1cf0-4b43-adbd-e9a0c7ff7d5e" />
+
+### Modul 5
+<img width="200" alt="Screenshot_2026-11-23-22-54-17-038_com example queue_dart" src="https://github.com/user-attachments/assets/e92a3f3a-388f-44b5-a68b-5e7dde00bcf2" />
+<img width="200" alt="Screenshot_2026-11-23-23-02-45-328_com example queue_dart" src="https://github.com/user-attachments/assets/512df3cb-3b11-40ca-9dd8-3cd073b32a19" />
+<img width="200" alt="Screenshot_2026-11-23-23-03-05-870_com example queue_dart" src="https://github.com/user-attachments/assets/b48c6a1a-2ae9-4544-8b85-9b495018b387" />
+<img width="200" alt="Screenshot_2026-11-23-23-04-27-984_com example queue_dart" src="https://github.com/user-attachments/assets/ae78a10b-50d2-4cd0-8fb3-6fa42073f88e" />
+<img width="200" alt="Screenshot_2026-11-23-23-20-52-963_com example queue_dart" src="https://github.com/user-attachments/assets/471e8268-f5a8-4e0c-8235-6377a9b963e1" />
+<img width="200" alt="Screenshot_2026-11-23-23-04-45-818_com example queue_dart" src="https://github.com/user-attachments/assets/d31abf0e-806d-4bd5-bfdc-c21a2bfed57a" />
+<img width="200" alt="Screenshot_2026-11-23-23-04-50-484_com example queue_dart" src="https://github.com/user-attachments/assets/bc5e2883-824b-4100-af43-584b6d66b5b9" />
+<img width="200" alt="Screenshot_2026-11-23-23-12-02-182_com example queue_dart" src="https://github.com/user-attachments/assets/91f09b48-3c9e-4561-9371-b9b09a0c9422" />
+
