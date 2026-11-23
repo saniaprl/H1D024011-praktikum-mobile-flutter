@@ -1,6 +1,10 @@
+
 import 'package:flutter/material.dart';
 
-import '../services/login_service.dart';
+import '../bloc/login_bloc.dart';
+import '../helpers/user_info.dart';
+import '../widget/warning_dialog.dart';
+
 import 'registrasi_page.dart';
 import 'produk_page.dart';
 
@@ -19,28 +23,55 @@ class _LoginPageState extends State<LoginPage> {
   final _emailTextboxController = TextEditingController();
   final _passwordTextboxController = TextEditingController();
 
-  // Proses login melalui API CodeIgniter
+  // ==========================================
+  // PROSES LOGIN MENGGUNAKAN BLOC
+  // ==========================================
+
   Future<void> _prosesLogin() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    if (_isLoading) return;
+
+    _formKey.currentState!.save();
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final hasil = await LoginService.login(
+      // Mengirim email dan password ke REST API
+      final hasil = await LoginBloc.login(
         email: _emailTextboxController.text.trim(),
         password: _passwordTextboxController.text,
       );
 
       if (!mounted) return;
 
+      // Memeriksa hasil login dari API CodeIgniter
       if (hasil.status == true &&
           hasil.code == 200 &&
-          hasil.token != null) {
+          hasil.token != null &&
+          hasil.token.toString().isNotEmpty) {
 
+        // Menyimpan token login
+        await UserInfo().setToken(
+          hasil.token.toString(),
+        );
+
+        // Menyimpan user ID jika tersedia
+        final userId = int.tryParse(
+          hasil.userID?.toString() ?? '',
+        );
+
+        if (userId != null) {
+          await UserInfo().setUserID(userId);
+        }
+
+        if (!mounted) return;
+
+        // Menampilkan notifikasi login berhasil
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login berhasil!'),
@@ -48,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
 
+        // Berpindah ke halaman daftar produk
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
@@ -56,20 +88,28 @@ class _LoginPageState extends State<LoginPage> {
           (route) => false,
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Email atau password salah'),
-            backgroundColor: Colors.red,
+        // Jika email atau password salah
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const WarningDialog(
+            description:
+                'Login gagal, email atau password salah',
           ),
         );
       }
-    } catch (e) {
+    } catch (error) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Login gagal: $e'),
-          backgroundColor: Colors.red,
+      // Jika terjadi error koneksi atau server
+      debugPrint('Login error: $error');
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => WarningDialog(
+          description:
+              'Login gagal, silahkan coba lagi.\n$error',
         ),
       );
     } finally {
@@ -81,7 +121,10 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Textbox Email
+  // ==========================================
+  // TEXTBOX EMAIL
+  // ==========================================
+
   Widget _emailTextField() {
     return TextFormField(
       controller: _emailTextboxController,
@@ -93,12 +136,16 @@ class _LoginPageState extends State<LoginPage> {
         if (value == null || value.trim().isEmpty) {
           return 'Email harus diisi';
         }
+
         return null;
       },
     );
   }
 
-  // Textbox Password
+  // ==========================================
+  // TEXTBOX PASSWORD
+  // ==========================================
+
   Widget _passwordTextField() {
     return TextFormField(
       controller: _passwordTextboxController,
@@ -110,12 +157,16 @@ class _LoginPageState extends State<LoginPage> {
         if (value == null || value.isEmpty) {
           return 'Password harus diisi';
         }
+
         return null;
       },
     );
   }
 
-  // Tombol Login
+  // ==========================================
+  // TOMBOL LOGIN
+  // ==========================================
+
   Widget _buttonLogin() {
     return SizedBox(
       width: double.infinity,
@@ -134,7 +185,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Menu Registrasi
+  // ==========================================
+  // MENU REGISTRASI
+  // ==========================================
+
   Widget _menuRegistrasi() {
     return Center(
       child: InkWell(
@@ -148,7 +202,8 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const RegistrasiPage(),
+              builder: (context) =>
+                  const RegistrasiPage(),
             ),
           );
         },
@@ -156,12 +211,20 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // ==========================================
+  // DISPOSE CONTROLLER
+  // ==========================================
+
   @override
   void dispose() {
     _emailTextboxController.dispose();
     _passwordTextboxController.dispose();
     super.dispose();
   }
+
+  // ==========================================
+  // TAMPILAN HALAMAN LOGIN
+  // ==========================================
 
   @override
   Widget build(BuildContext context) {
@@ -178,10 +241,13 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 _emailTextField(),
                 const SizedBox(height: 12),
+
                 _passwordTextField(),
                 const SizedBox(height: 24),
+
                 _buttonLogin(),
                 const SizedBox(height: 30),
+
                 _menuRegistrasi(),
               ],
             ),

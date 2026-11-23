@@ -1,13 +1,17 @@
 
 import 'package:flutter/material.dart';
-import '../services/registrasi_service.dart';
+
+import '../bloc/registrasi_bloc.dart';
+import '../widget/success_dialog.dart';
+import '../widget/warning_dialog.dart';
 import 'login_page.dart';
 
 class RegistrasiPage extends StatefulWidget {
   const RegistrasiPage({super.key});
 
   @override
-  State<RegistrasiPage> createState() => _RegistrasiPageState();
+  State<RegistrasiPage> createState() =>
+      _RegistrasiPageState();
 }
 
 class _RegistrasiPageState extends State<RegistrasiPage> {
@@ -18,20 +22,29 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
   final _namaTextboxController = TextEditingController();
   final _emailTextboxController = TextEditingController();
   final _passwordTextboxController = TextEditingController();
-  final _konfirmasiPasswordController = TextEditingController();
+  final _konfirmasiPasswordController =
+      TextEditingController();
 
-  // Proses registrasi ke API CodeIgniter
-  Future<void> _prosesRegistrasi() async {
+  // ==========================================
+  // PROSES REGISTRASI MENGGUNAKAN BLOC
+  // ==========================================
+
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
+    if (_isLoading) return;
+
+    _formKey.currentState!.save();
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final hasil = await RegistrasiService.registrasi(
+      // Mengirim data registrasi ke REST API
+      final hasil = await RegistrasiBloc.registrasi(
         nama: _namaTextboxController.text.trim(),
         email: _emailTextboxController.text.trim(),
         password: _passwordTextboxController.text,
@@ -39,36 +52,56 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
 
       if (!mounted) return;
 
+      // Memeriksa hasil registrasi dari API
       if (hasil.status == true && hasil.code == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registrasi berhasil! Silakan login.'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LoginPage(),
-          ),
+        // Menampilkan dialog sukses
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return SuccessDialog(
+              description:
+                  "Registrasi berhasil, silahkan login",
+              okClick: () {
+                // Berpindah ke halaman Login
+                Navigator.pushReplacement(
+                  this.context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        const LoginPage(),
+                  ),
+                );
+              },
+            );
+          },
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(hasil.data ?? 'Registrasi gagal'),
-            backgroundColor: Colors.red,
-          ),
+        // Menampilkan dialog jika registrasi gagal
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return WarningDialog(
+              description:
+                  hasil.data?.toString() ??
+                  "Registrasi gagal, silahkan coba lagi",
+            );
+          },
         );
       }
-    } catch (e) {
+    } catch (error) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal menghubungi server: $e'),
-          backgroundColor: Colors.red,
-        ),
+      // Menampilkan dialog ketika terjadi error
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return WarningDialog(
+            description:
+                "Registrasi gagal, silahkan coba lagi.\n$error",
+          );
+        },
       );
     } finally {
       if (mounted) {
@@ -79,7 +112,10 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     }
   }
 
-  // Textbox Nama
+  // ==========================================
+  // TEXTBOX NAMA
+  // ==========================================
+
   Widget _namaTextField() {
     return TextFormField(
       controller: _namaTextboxController,
@@ -96,7 +132,10 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     );
   }
 
-  // Textbox Email
+  // ==========================================
+  // TEXTBOX EMAIL
+  // ==========================================
+
   Widget _emailTextField() {
     return TextFormField(
       controller: _emailTextboxController,
@@ -122,7 +161,10 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     );
   }
 
-  // Textbox Password
+  // ==========================================
+  // TEXTBOX PASSWORD
+  // ==========================================
+
   Widget _passwordTextField() {
     return TextFormField(
       controller: _passwordTextboxController,
@@ -139,7 +181,10 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     );
   }
 
-  // Textbox Konfirmasi Password
+  // ==========================================
+  // TEXTBOX KONFIRMASI PASSWORD
+  // ==========================================
+
   Widget _passwordKonfirmasiTextField() {
     return TextFormField(
       controller: _konfirmasiPasswordController,
@@ -161,12 +206,15 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     );
   }
 
-  // Tombol Registrasi
+  // ==========================================
+  // TOMBOL REGISTRASI
+  // ==========================================
+
   Widget _buttonRegistrasi() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _isLoading ? null : _prosesRegistrasi,
+        onPressed: _isLoading ? null : _submit,
         child: _isLoading
             ? const SizedBox(
                 height: 20,
@@ -180,6 +228,10 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     );
   }
 
+  // ==========================================
+  // DISPOSE CONTROLLER
+  // ==========================================
+
   @override
   void dispose() {
     _namaTextboxController.dispose();
@@ -188,6 +240,10 @@ class _RegistrasiPageState extends State<RegistrasiPage> {
     _konfirmasiPasswordController.dispose();
     super.dispose();
   }
+
+  // ==========================================
+  // TAMPILAN HALAMAN REGISTRASI
+  // ==========================================
 
   @override
   Widget build(BuildContext context) {
